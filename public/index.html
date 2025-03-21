@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bill Calculator</title>
+  <link rel="stylesheet" href="style(bill).css">
+</head>
+<body>
+  <div class="container">
+    <h2>Bill Calculator</h2>
+    <div>
+      <label for="itemName">Item Name</label>
+      <input type="text" id="itemName">
+    </div>
+    <div>
+      <label for="quantity">Quantity</label>
+      <input type="number" id="quantity" value="0" min="0">
+    </div>
+    <div>
+      <label for="price">Price</label>
+      <input type="number" id="price" value="0" min="0" step="1">
+    </div>
+    <div>
+      <button onclick="calculate()">Add Item</button>
+    </div>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Cost</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="billItems"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4"><strong>Total:</strong></td>
+            <td id="totalCost">0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <script>
+    function calculate() {
+      var itemName = document.getElementById('itemName').value;
+      var quantity = parseInt(document.getElementById('quantity').value);
+      var price = parseFloat(document.getElementById('price').value);
+      var totalCost = quantity * price;
+
+      var newRow = '<tr>' +
+        '<td>' + itemName + '</td>' +
+        '<td>' + quantity + '</td>' +
+        '<td>' + price.toFixed(2) + '</td>' +
+        '<td>' + totalCost.toFixed(2) + '</td>' +
+        '<td><button onclick="removeItem(this)">Remove</button></td>' +
+        '</tr>';
+
+      document.getElementById('billItems').innerHTML += newRow;
+
+      updateTotalCost();
+    }
+
+    function removeItem(button) {
+      button.parentNode.parentNode.remove();
+      updateTotalCost();
+    }
+
+    function updateTotalCost() {
+      var totalCost = 0;
+      var rows = document.querySelectorAll('#billItems tr');
+      rows.forEach(function(row) {
+        var rowTotalCost = parseFloat(row.querySelectorAll('td')[3].innerText);
+        totalCost += isNaN(rowTotalCost) ? 0 : rowTotalCost;
+      });
+
+      document.getElementById('totalCost').innerText = totalCost.toFixed(2);
+    }
+  </script>
+</body>
+</html>
