@@ -17,7 +17,7 @@ spec:
           image: abishekpranav/bill-calculator:latest
           ports:
             - containerPort: 80
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
 ---
 apiVersion: v1
 kind: Service
