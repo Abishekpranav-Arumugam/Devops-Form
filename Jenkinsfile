@@ -4,15 +4,15 @@ pipeline {
     environment {
         DOCKER_IMAGE = "abishekpranav/bill-calculator"
         DOCKER_TAG = "latest"
-        DOCKER_CREDENTIALS_ID = "docker"
+        DOCKER_CREDENTIALS_ID = "dockerhub_credentials"
         GITHUB_CREDENTIALS_ID = "github_seccred"
-        KUBECONFIG = '/home/abishekpranav/.kube/config'  // Ensure correct Minikube context
+        KUBECONFIG = "/home/abishekpranav/.kube/config"  // Ensure correct Minikube context
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: GITHUB_CREDENTIALS_ID, url: 'https://github.com/Abishekpranav-Arumugam/Devops-Form', branch: 'main'
+                git branch: 'main', credentialsId: GITHUB_CREDENTIALS_ID, url: 'https://github.com/Abishekpranav-Arumugam/Devops-Form'
             }
         }
 
@@ -26,8 +26,11 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: '']) {
-                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                script {
+                    withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: "https://index.docker.io/v1/"]) {
+                        sh "docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD"
+                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    }
                 }
             }
         }
@@ -35,8 +38,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh 'kubectl config use-context minikube' // Ensure Minikube context
-                    sh 'kubectl apply -f bill-deployment.yml --validate=false'
+                    sh '''
+                    export KUBECONFIG=/home/abishekpranav/.kube/config
+                    kubectl config use-context minikube
+                    kubectl apply -f bill-deployment.yml --validate=false
+                    '''
                 }
             }
         }
