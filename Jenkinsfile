@@ -6,7 +6,7 @@ pipeline {
         DOCKER_TAG = "latest"
         DOCKER_CREDENTIALS_ID = "docker"
         GITHUB_CREDENTIALS_ID = "github_seccred"
-        KUBECONFIG = "/var/lib/jenkins/.kube/config"
+        KUBECONFIG = '/home/abishekpranav/.kube/config'  // Ensure correct Minikube context
     }
 
     stages {
@@ -35,7 +35,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh "kubectl apply -f bill-deployment.yml"
+                    sh 'kubectl config use-context minikube' // Ensure Minikube context
+                    sh 'kubectl apply -f bill-deployment.yml --validate=false'
                 }
             }
         }
